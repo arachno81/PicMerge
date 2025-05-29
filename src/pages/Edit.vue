@@ -13,6 +13,17 @@
 				<!-- ファイル選択 -->
 			<input type="file" multiple @change="handleFileChange" accept="image/*" />
 
+			<div class="mt-6 space-x-4">
+				<label class="inline-block">
+					出力幅:
+					<input type="number" v-model.number="outputWidth" class="border px-2 py-1 w-24" />
+				</label>
+				<label class="inline-block">
+					出力高さ:
+					<input type="number" v-model.number="outputHeight" class="border px-2 py-1 w-24" />
+				</label>
+			</div>
+
 			<!-- プレビュー表示 -->
 			<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
 				<div
@@ -41,6 +52,9 @@ const previews = ref([])
 const mergedImage = ref(null)
 
 const selectedImages = ref([])
+
+const outputWidth = ref(1200)
+const outputHeight = ref(800)
 
 function handleFileChange(e){
 	const files = e.target.files

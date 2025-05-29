@@ -2,7 +2,7 @@
 	<div>
 		<div class="p-6">
 			<h2 class="text-2xl font-bold mb-4">画像インポート</h2>
-			<!-- Drug & Drop -->
+			<!-- Drag & Drop -->
 			<div
 				@dragover.prevent
 				@drop.prevent="handleDrop"
@@ -18,7 +18,9 @@
 				<div
 					v-for="(img, index) in previews"
 					:key="index"
-					class="border rounded overflow-hidden"
+					class="border rounded overflow-hidden cursor-pointer"
+					:class="{ 'ring-4 ring-blue-500' : selectedImages.includes(img) }"
+					@click="toggleSelection(img)"
 					>
 					<img :src="img" class="w-full object-cover" />
 				</div>
@@ -38,6 +40,8 @@ import { ref, watch } from 'vue'
 const previews = ref([])
 const mergedImage = ref(null)
 
+const selectedImages = ref([])
+
 function handleFileChange(e){
 	const files = e.target.files
 	previewFiles(files)
@@ -51,6 +55,8 @@ function handleDrop(e){
 function previewFiles(files){
 	previews.value = []
 	mergedImage.value = null
+
+	//selectedImages.value = []
 
 	const newPreviews = []
 
@@ -68,13 +74,28 @@ function previewFiles(files){
 	}
 }
 
+function toggleSelection(img){
+	const index = selectedImages.value.indexOf(img)
+	if(index !== -1){
+		selectedImages.value.splice(index, 1)
+	}else{
+		if(selectedImages.value.length < 4){
+			selectedImages.value.push(img)
+		}else{
+			alert('4枚までしか選択できません')
+		}
+	}
+}
+
 //プレビュー画像が4枚揃ったら自動で結合
-watch(previews, async(newVal)=>{
-console.log('watch triggered', newVal.length)
+watch(selectedImages, async(newVal)=>{
+	console.log('bbbb')
 	if(newVal.length === 4){
 		await mergeFourImages(newVal)
 	}
-})
+},
+{deep: true} //中身の変更にも反応し動作するように
+)
 
 //画像を2*2で合成
 async function mergeFourImages(imageSrcs){

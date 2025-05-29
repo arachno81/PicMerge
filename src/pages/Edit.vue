@@ -123,19 +123,32 @@ async function mergeFourImages(imageSrcs){
 				})
 		)
 	)
-	// 各画像のサイズを基準に結合画像サイズを決定(最小のサイズに合わせる)
-	const tileWidth = Math.min(...images.map((img) => img.width))
-	const tileHeight = Math.min(...images.map((img) => img.height))
 	const canvas = document.createElement('canvas')
-	canvas.width = tileWidth * 2
-	canvas.height = tileHeight * 2
+	canvas.width = outputWidth.value
+	canvas.height = outputHeight.value
 	const ctx = canvas.getContext('2d')
 
-	//2*2に
+	const tileWidth = canvas.width / 2
+	const tileHeight = canvas.height / 2
+
 	for(let i = 0;i < 4;i++){
 		const x = (i % 2) * tileWidth
 		const y = Math.floor(i / 2) * tileHeight
-		ctx.drawImage(images[i], 0, 0, tileWidth, tileHeight, x, y, tileWidth, tileHeight)
+		const img = images[i]
+
+		//background-position: center;のような形で画像中央寄せ描画
+		let sx = 0, sy = 0, sWidth = img.width, sHeight = img.height
+		const imgAspect = img.width / img.height
+		const tileAspect = tileWidth / tileHeight
+
+		if(tileAspect < imgAspect){
+			sWidth = img.height * tileAspect
+			sx = (img.width - sWidth) / 2
+		}else{
+			sHeight = img.width / tileAspect
+			sy = (img.height - sHeight) / 2
+		}
+		ctx.drawImage(img, sx, sy, sWidth, sHeight, x, y, tileWidth, tileHeight)
 	}
 	mergedImage.value = canvas.toDataURL()
 }
